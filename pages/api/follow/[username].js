@@ -18,11 +18,11 @@ export default async function handler(req, res) {
     const userToFollow = await Flutter.findOne({ username });
 
     // Add the user to the current user's followers
-    currentUser.followers.push(userToFollow.username);
+    currentUser.following.push(userToFollow.username);
     await currentUser.save();
 
     // Add the current user to the user to follow's following
-    userToFollow.following.push(currentUser.username);
+    userToFollow.followers.push(currentUser.username);
     await userToFollow.save();
 
     res.status(200).json({ message: "Followed successfully" });
