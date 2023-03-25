@@ -9,11 +9,14 @@ export default function Users() {
     async function fetchUsers() {
       const res = await fetch("/api/users");
       const data = await res.json();
-      setUsers(data);
+      const filteredUsers = data.filter(
+        (user) => user.username !== currentUser?.username
+      );
+      setUsers(filteredUsers);
     }
 
     fetchUsers();
-  }, []);
+  }, [currentUser]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -44,30 +47,32 @@ export default function Users() {
   };
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Username</th>
-          <th>Interact</th>
-        </tr>
-      </thead>
-      <tbody>
-        {users.map((user, index) => (
-          <tr key={index}>
-            <td>{user.name}</td>
-            <td>{user.username}</td>
-            <td>
-              {currentUser && !user.following && (
-                <button onClick={() => handleFollow(user.username)}>
-                  Follow
-                </button>
-              )}
-              {currentUser && user.following && <p>Following</p>}
-            </td>
+    <>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Interact</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {users.map((user, index) => (
+            <tr key={index}>
+              <td>{user.name}</td>
+              <td>{user.username}</td>
+              <td>
+                {currentUser && !user.following && (
+                  <button onClick={() => handleFollow(user.username)}>
+                    Follow
+                  </button>
+                )}
+                {currentUser && user.following && <p>Following</p>}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
   );
 }
