@@ -28,18 +28,17 @@ export default function Flutter(params) {
     }
   };
 
-  const handleLike = async (postId) => {
-    const response = await fetch(`/api/posts/${postId}/like`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username }),
-    });
-    if (response.ok) {
-      setNumPosts(numPosts + 1);
-    } else {
-      console.error("Failed to like post");
+  const handleLike = async () => {
+    if (username) {
+      const data = { username };
+      const res = await fetch(`/api/like/${username}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      console.log(res);
     }
   };
 
@@ -111,7 +110,7 @@ export default function Flutter(params) {
           <h3>{post.author}</h3>
           <p>{post.text}</p>
           <button onClick={handleLike}>❤️</button>
-          <span>{0}</span>
+          <span>{post.likes.length}</span>
           <br />
           <br />
           <small>{new Date(post.createdAt).toLocaleString()}</small>
