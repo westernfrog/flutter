@@ -1,14 +1,14 @@
-import mongoose, { models, model } from "mongoose";
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true, // Corrected typo: 'require' should be 'required'
+      required: true,
     },
     username: {
       type: String,
-      required: true, // Corrected typo: 'require' should be 'required'
+      required: true,
     },
     email: {
       type: String,
@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Flutter = models.Flutter || model("Flutter", userSchema);
+const Flutter =
+  mongoose.models.Flutter || mongoose.model("Flutter", userSchema);
 
 export default Flutter;

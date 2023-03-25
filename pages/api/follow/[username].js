@@ -1,6 +1,5 @@
 import connectToDatabase from "@/utils/dbConnect";
 import Flutter from "@/model/User";
-import jwt from "jsonwebtoken";
 
 connectToDatabase();
 
