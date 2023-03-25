@@ -4,21 +4,44 @@ import { useState, useEffect } from "react";
 import jwt from "jsonwebtoken";
 
 export default function Flutter(params) {
+  const router = useRouter();
   const [text, setText] = useState("");
   const [posts, setPosts] = useState([]);
   const [numPosts, setNumPosts] = useState(0);
-
   const [username, setUserName] = useState("");
-  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       const decoded = jwt.decode(token);
       setUserName(decoded.username.toString());
-      setEmail(decoded.email.toString());
     }
   }, []);
+
+  const handleProfileClick = async (e) => {
+    e.preventDefault();
+    if (username) {
+      router.push({
+        pathname: "/profile",
+        query: { username },
+      });
+    }
+  };
+
+  const handleLike = async (postId) => {
+    const response = await fetch(`/api/posts/${postId}/like`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username }),
+    });
+    if (response.ok) {
+      setNumPosts(numPosts + 1);
+    } else {
+      console.error("Failed to like post");
+    }
+  };
 
   useEffect(() => {
     async function fetchPosts() {
@@ -42,12 +65,11 @@ export default function Flutter(params) {
     if (response.ok) {
       setText("");
       setNumPosts(numPosts + 1);
-      // Refresh the posts list
     } else {
       console.error("Failed to create post");
     }
   };
-  const router = useRouter();
+
   const logout = () => {
     localStorage.removeItem("token");
     setTimeout(() => {
@@ -56,8 +78,6 @@ export default function Flutter(params) {
   };
   return (
     <>
-      <h1>{username}</h1>
-      <p>{email}</p>
       <Link href={"/login"}>Login</Link>
       <br />
       <Link href={"/signup"}>Sign up</Link>
@@ -65,6 +85,10 @@ export default function Flutter(params) {
       <Link href={"/search"}>Search</Link>
       <br />
       <Link href={"/users"}>All Users</Link>
+      <br />
+      <Link href={"/profile"} onClick={handleProfileClick}>
+        Profile
+      </Link>
       <br />
       <button onClick={logout}>Log out</button>
       <br />
@@ -86,6 +110,10 @@ export default function Flutter(params) {
         <div key={post._id}>
           <h3>{post.author}</h3>
           <p>{post.text}</p>
+          <button onClick={handleLike}>❤️</button>
+          <span>{0}</span>
+          <br />
+          <br />
           <small>{new Date(post.createdAt).toLocaleString()}</small>
         </div>
       ))}
