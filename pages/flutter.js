@@ -2,13 +2,16 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import jwt from "jsonwebtoken";
+import Navigation from "@/components/Navigation";
+import CreatePost from "@/components/CreatePost";
 
 export default function Flutter(params) {
   const router = useRouter();
-  const [text, setText] = useState("");
   const [posts, setPosts] = useState([]);
   const [numPosts, setNumPosts] = useState(0);
   const [username, setUserName] = useState("");
+  const [postComments, setPostComments] = useState({});
+  const [commentValues, setCommentValues] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -18,15 +21,26 @@ export default function Flutter(params) {
     }
   }, []);
 
-  const handleProfileClick = async (e) => {
-    e.preventDefault();
-    if (username) {
-      router.push({
-        pathname: "/profile",
-        query: { username },
+  useEffect(() => {
+    async function fetchPosts() {
+      const postRes = await fetch("/api/posts");
+      const posts = await postRes.json();
+
+      const commentRes = await fetch("/api/comments");
+      const comments = await commentRes.json();
+      const postComments = {};
+      posts.forEach((post) => {
+        postComments[post._id] = comments.filter(
+          (comment) => comment._id === post._id
+        );
       });
+
+      setPosts(posts);
+      setPostComments(postComments);
     }
-  };
+
+    fetchPosts();
+  }, [numPosts]);
 
   const handleLike = async (postId, likes) => {
     if (!username) {
@@ -67,56 +81,6 @@ export default function Flutter(params) {
     }
   };
 
-  const [postComments, setPostComments] = useState({});
-
-  useEffect(() => {
-    async function fetchPosts() {
-      const postRes = await fetch("/api/posts");
-      const posts = await postRes.json();
-
-      const commentRes = await fetch("/api/comments");
-      const comments = await commentRes.json();
-
-      const postComments = {};
-
-      posts.forEach((post) => {
-        postComments[post._id] = comments.filter(
-          (comment) => comment._id === post._id
-        );
-      });
-
-      setPosts(posts);
-      setPostComments(postComments);
-    }
-
-    fetchPosts();
-  }, [numPosts]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (username) {
-      const response = await fetch("/api/createPost", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text, username }),
-      });
-      if (response.ok) {
-        setText("");
-        setNumPosts(numPosts + 1);
-      } else {
-        console.error("Failed to create post");
-      }
-    } else {
-      router.push({
-        pathname: "/login",
-      });
-    }
-  };
-
-  const [commentValues, setCommentValues] = useState([]);
-
   useEffect(() => {
     setCommentValues(posts.map((post) => ({ postId: post._id, value: "" })));
   }, [posts]);
@@ -152,13 +116,12 @@ export default function Flutter(params) {
     if (response.ok) {
       setNumPosts(numPosts + 1);
       const comment = await response.json();
-      // Find the comments for the current post and add the new comment
       const commentsForPost = postComments[postId] || [];
       setPostComments({
         ...postComments,
         [postId]: [...commentsForPost, comment],
       });
-      // Clear the comment value for the current post
+
       setCommentValues((commentValues) =>
         commentValues.map((commentValue) =>
           commentValue.postId === postId
@@ -171,29 +134,15 @@ export default function Flutter(params) {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setTimeout(() => {
-      router.push("/");
-    }, 200);
+  const handleShowComments = async (e) => {
+    setNumPosts(numPosts + 1);
   };
+
   return (
     <>
       {username ? (
         <>
-          <Link href={"/login"}>Login</Link>
-          <br />
-          <Link href={"/signup"}>Sign up</Link>
-          <br />
-          <Link href={"/search"}>Search</Link>
-          <br />
-          <Link href={"/users"}>All Users</Link>
-          <br />
-          <Link href={"/profile"} onClick={handleProfileClick}>
-            Profile
-          </Link>
-          <br />
-          <button onClick={logout}>Log out</button>
+          <Navigation username={username} />
         </>
       ) : (
         <>
@@ -202,19 +151,12 @@ export default function Flutter(params) {
           <Link href={"/signup"}>Create a account</Link>
         </>
       )}
-      <br />
-      <h2>Share anything</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="What's on your mind?"
-        />
-        <input type="hidden" name="username" value={username} />
-        <button type="submit">Post!</button>
-      </form>
-      <br />
+      <CreatePost
+        setNumPosts={setNumPosts}
+        username={username}
+        numPosts={numPosts + 1}
+      />
+
       <h1>Latest Posts</h1>
       {posts.map((post) => (
         <div key={post._id}>
@@ -245,17 +187,27 @@ export default function Flutter(params) {
                 onChange={(e) => handleCommentChange(post._id, e.target.value)}
                 placeholder="Comments"
               />
-              <button type="submit">Comment</button>
+              <button type="submit" onClick={handleShowComments}>
+                Comment
+              </button>
             </form>
           </div>
-          {postComments[post._id] &&
-            postComments[post._id].map((comment) =>
-              comment.comments.map((c) => (
-                <p key={c._id}>
-                  {c.author}: {c.comment}
-                </p>
-              ))
-            )}
+          <p>Comments</p>
+          <ul>
+            {postComments[post._id] &&
+              postComments[post._id].map((comment) =>
+                comment.comments
+                  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort by creation date in descending order
+                  .map((c) => (
+                    <li key={c._id}>
+                      {c.author}: {c.comment}
+                      <br />
+                      <p>{new Date(c.createdAt).toLocaleString()}</p>
+                    </li>
+                  ))
+              )}
+          </ul>
+          <hr />
         </div>
       ))}
     </>
