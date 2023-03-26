@@ -48,31 +48,35 @@ export default function Users() {
 
   return (
     <>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Username</th>
-            <th>Interact</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user, index) => (
-            <tr key={index}>
-              <td>{user.name}</td>
-              <td>{user.username}</td>
-              <td>
-                {currentUser && !user.following && (
-                  <button onClick={() => handleFollow(user.username)}>
-                    Follow
-                  </button>
-                )}
-                {currentUser && user.following && <p>Following</p>}
-              </td>
+      {currentUser ? (
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Username</th>
+              <th>Interact</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map((user, index) => (
+              <tr key={index}>
+                <td>{user.name}</td>
+                <td>{user.username}</td>
+                <td>
+                  {currentUser && !user.following && (
+                    <button onClick={() => handleFollow(user.username)}>
+                      Follow
+                    </button>
+                  )}
+                  {currentUser && user.following && <p>Following</p>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <h1>Create an account to see all users</h1>
+      )}
     </>
   );
 }

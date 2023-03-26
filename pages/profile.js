@@ -34,6 +34,7 @@ function Profile() {
       {userData ? (
         <div>
           <p>Name: {userData.name}</p>
+          <p>Username: {username}</p>
           <p>Email: {userData.email}</p>
           <p>Followers: {userData.followers}</p>
           <p>Following: {userData.following}</p>
