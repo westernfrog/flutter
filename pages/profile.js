@@ -36,8 +36,8 @@ function Profile() {
           <p>Name: {userData.name}</p>
           <p>Username: {username}</p>
           <p>Email: {userData.email}</p>
-          <p>Followers: {userData.followers}</p>
-          <p>Following: {userData.following}</p>
+          <p>Followers: {userData.followers.length}</p>
+          <p>Following: {userData.following.length}</p>
         </div>
       ) : (
         <p>User not found</p>

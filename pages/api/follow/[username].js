@@ -14,13 +14,29 @@ export default async function handler(req, res) {
 
     const userToFollow = await Flutter.findOne({ username });
 
-    currentUser.following.push(userToFollow.username);
-    await currentUser.save();
+    if (!currentUser.following.includes(userToFollow.username)) {
+      // Follow the user
+      currentUser.following.push(userToFollow.username);
+      await currentUser.save();
 
-    userToFollow.followers.push(currentUser.username);
-    await userToFollow.save();
+      userToFollow.followers.push(currentUser.username);
+      await userToFollow.save();
 
-    res.status(200).json({ message: "Followed successfully" });
+      res.status(200).json({ message: "Followed successfully" });
+    } else {
+      // Unfollow the user
+      currentUser.following = currentUser.following.filter(
+        (followedUser) => followedUser !== userToFollow.username
+      );
+      await currentUser.save();
+
+      userToFollow.followers = userToFollow.followers.filter(
+        (follower) => follower !== currentUser.username
+      );
+      await userToFollow.save();
+
+      res.status(200).json({ message: "Unfollowed successfully" });
+    }
   } else {
     res.status(405).json({ message: "Method not allowed" });
   }

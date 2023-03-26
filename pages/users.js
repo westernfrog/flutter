@@ -1,9 +1,37 @@
 import { useState, useEffect } from "react";
 import jwt from "jsonwebtoken";
+import { useRouter } from "next/router";
 
 export default function Users() {
+  const router = useRouter();
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [numPosts, setNumPosts] = useState(0);
+  const { username } = router.query;
+
+  const fetchData = async () => {
+    if (username) {
+      const data = { username };
+      const res = await fetch("/api/profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const response = await res.json();
+      if (res.status === 200) {
+        setUserData(response);
+      } else {
+        setUserData(null);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [username, numPosts]);
 
   useEffect(() => {
     async function fetchUsers() {
@@ -36,14 +64,24 @@ export default function Users() {
         },
         body: JSON.stringify(data),
       });
-      const { message } = await res.json();
-      alert(message);
+
+      setNumPosts(numPosts + 1);
+
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
-          user.username === username ? { ...user, following: true } : user
+          user.username === username
+            ? { ...user, following: !user.following }
+            : user
         )
       );
     }
+  };
+
+  const isFollowingUser = (username) => {
+    if (userData && userData.following) {
+      return userData.following.includes(username);
+    }
+    return false;
   };
 
   return (
@@ -63,12 +101,16 @@ export default function Users() {
                 <td>{user.name}</td>
                 <td>{user.username}</td>
                 <td>
-                  {currentUser && !user.following && (
+                  {currentUser && !isFollowingUser(user.username) && (
                     <button onClick={() => handleFollow(user.username)}>
                       Follow
                     </button>
                   )}
-                  {currentUser && user.following && <p>Following</p>}
+                  {currentUser && isFollowingUser(user.username) && (
+                    <button onClick={() => handleFollow(user.username)}>
+                      Following
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
