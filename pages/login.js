@@ -21,7 +21,8 @@ export default function Login(params) {
       setPassword(e.target.value);
     }
   };
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (email.match(emailRegex)) {
       setEmailError(false);
       if (password.match(paswdRegex)) {
@@ -44,9 +45,9 @@ export default function Login(params) {
           localStorage.setItem("token", response.token);
           console.log("Success");
 
-          setTimeout(() => {
-            router.push("/flutter");
-          }, 200);
+          router.push({
+            pathname: "/flutter",
+          });
         } else {
           console.log(response.error);
           setError(response.error);
@@ -64,29 +65,46 @@ export default function Login(params) {
   };
   return (
     <>
-      <input
-        type="email"
-        placeholder="email"
-        name="email"
-        value={email}
-        onChange={handleChange}
-        required
-      />
-      <p>{emailError}</p>
-      <br />
-      <input
-        type="password"
-        placeholder="password"
-        name="password"
-        value={password}
-        onChange={handleChange}
-        autoComplete="off"
-        required
-      />
-      <p>{passwordError}</p>
-      <br />
-      <p>{error}</p>
-      <button onClick={handleSubmit}>Login</button>
+      <form onClick={handleSubmit}>
+        <input
+          type="email"
+          placeholder="email"
+          name="email"
+          value={email}
+          onChange={handleChange}
+          required
+        />
+        <div
+          className={`${
+            emailError ? "d-grid" : "d-none"
+          } fs-8 text-warning ms-1`}
+        >
+          <small>Please enter a valid email address.</small>
+        </div>
+        <br />
+        <input
+          type="password"
+          placeholder="password"
+          name="password"
+          value={password}
+          onChange={handleChange}
+          autoComplete="off"
+          required
+        />
+        <div
+          className={`${
+            passwordError ? "d-grid" : "d-none"
+          } fs-8 text-warning ms-1`}
+        >
+          <small>
+            Your password should be between 5 to 15 characters and must include
+            at least one numeric digit and a special character.
+          </small>
+        </div>
+        <br />
+        <p>{error}</p>
+        <button type="submit">Login</button>
+      </form>
     </>
   );
 }

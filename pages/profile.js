@@ -32,13 +32,31 @@ function Profile() {
   return (
     <div>
       {userData ? (
-        <div>
-          <p>Name: {userData.name}</p>
-          <p>Username: {username}</p>
-          <p>Email: {userData.email}</p>
-          <p>Followers: {userData.followers.length}</p>
-          <p>Following: {userData.following.length}</p>
-        </div>
+        <>
+          <div>
+            <p>Name: {userData.name}</p>
+            <p>Username: {username}</p>
+            <p>Email: {userData.email}</p>
+            <p>Followers: {userData.followers.length}</p>
+            <p>Following: {userData.following.length}</p>
+          </div>
+          <br />
+          <br />
+          Followers:
+          <ul>
+            {userData.followers.map((followers, index) => (
+              <li key={index}>{followers}</li>
+            ))}
+          </ul>
+          <br />
+          <br />
+          Following:
+          <ul>
+            {userData.following.map((following, index) => (
+              <li key={index}>{following}</li>
+            ))}
+          </ul>
+        </>
       ) : (
         <p>User not found</p>
       )}

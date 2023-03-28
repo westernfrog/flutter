@@ -28,16 +28,19 @@ export default function Search(params) {
   };
   return (
     <>
+      <p>Enter the username you want to search</p>
       <input
         type="text"
         name="username"
         value={username}
         onChange={handleChange}
         required
+        autoComplete="off"
       />
       <br />
       <button onClick={handleSubmit}>Search</button>
-      {userData && (
+
+      {userData && userData ? (
         <>
           <p>User found:</p>
           <ul>
@@ -47,6 +50,8 @@ export default function Search(params) {
             <li>Following: {userData.following}</li>
           </ul>
         </>
+      ) : (
+        <p>User not found</p>
       )}
     </>
   );

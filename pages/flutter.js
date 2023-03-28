@@ -161,7 +161,7 @@ export default function Flutter(params) {
       {posts.map((post) => (
         <div key={post._id}>
           <h3>{post.author}</h3>
-          <p>{post.text}</p>
+          <p>&gt; {post.text}</p>
           <button onClick={() => handleLike(post._id, post.likes)}>
             {post.likes.includes(username) ? "❤️" : "🤍"}
           </button>

@@ -28,7 +28,8 @@ export default function SignUp(params) {
       setUserName(e.target.value);
     }
   };
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (name.length > 3) {
       setEmailError(false);
       if (email.match(emailRegex)) {
@@ -49,13 +50,14 @@ export default function SignUp(params) {
           setName("");
           setEmail("");
           setPassword("");
+          setUserName("");
 
           if (response.success) {
             console.log("Success");
 
-            setTimeout(() => {
-              router.push("/login");
-            }, 2000);
+            router.push({
+              pathname: "/login",
+            });
           } else {
             console.log(response.error);
             setError(response.error);
@@ -79,48 +81,65 @@ export default function SignUp(params) {
 
   return (
     <>
-      <input
-        type="text"
-        placeholder="name"
-        name="name"
-        value={name}
-        onChange={handleChange}
-        required
-      />
-      <p>{nameError}</p>
-      <br />
-      <input
-        type="text"
-        placeholder="username"
-        name="username"
-        value={username}
-        onChange={handleChange}
-        required
-      />
-      <br />
-      <br />
-      <input
-        type="email"
-        placeholder="email"
-        name="email"
-        value={email}
-        onChange={handleChange}
-        required
-      />
-      <p>{emailError}</p>
-      <br />
-      <input
-        type="password"
-        placeholder="password"
-        name="password"
-        value={password}
-        onChange={handleChange}
-        required
-      />
-      <p>{passwordError}</p>
-      <br />
-      <p>{error}</p>
-      <button onClick={handleSubmit}>Signup</button>
+      <form onClick={handleSubmit}>
+        <input
+          type="text"
+          placeholder="name"
+          name="name"
+          value={name}
+          onChange={handleChange}
+          required
+        />
+        <p>{nameError}</p>
+        <br />
+        <input
+          type="text"
+          placeholder="username"
+          name="username"
+          value={username}
+          onChange={handleChange}
+          required
+        />
+        <br />
+        <br />
+        <input
+          type="email"
+          placeholder="email"
+          name="email"
+          value={email}
+          onChange={handleChange}
+          required
+        />
+        <div
+          className={`${
+            emailError ? "d-grid" : "d-none"
+          } fs-8 text-warning ms-1`}
+        >
+          <small>Please enter a valid email address.</small>
+        </div>
+        <br />
+        <input
+          type="password"
+          placeholder="password"
+          name="password"
+          value={password}
+          onChange={handleChange}
+          required
+        />
+        <div
+          className={`${
+            passwordError ? "d-grid" : "d-none"
+          } fs-8 text-warning ms-1`}
+        >
+          <small>
+            Your password should be between 5 to 15 characters and must include
+            at least one numeric digit and a special character.
+          </small>
+        </div>
+        <br />
+        <p>{error}</p>
+        <button type="submit">Signup</button>
+      </form>
     </>
   );
 }

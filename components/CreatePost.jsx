@@ -36,11 +36,11 @@ export default function CreatePost({ username, ...props }) {
       <br />
       <h2>Share anything</h2>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
+        <textarea
           value={text}
           onChange={handleFormChange}
           placeholder="What's on your mind?"
+          rows={3}
         />
         <input type="hidden" name="username" value={username} />
         <button type="submit">Post!</button>
