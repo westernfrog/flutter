@@ -33,6 +33,7 @@ export default function Navigation({ username }) {
 
   return (
     <>
+      <h1>Flutters</h1>
       <Link href={"/login"}>Login</Link>
       <br />
       <Link href={"/signup"}>Sign up</Link>
