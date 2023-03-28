@@ -1,6 +1,6 @@
 # flutter
 
-**Flutter** is a simple social media site where users can share there thoughts. ⚡
+**Flutter** is a simple social media site where users can share their thoughts. ⚡
 But the real thing in this project is that it has no styling just the backend. 💻
 
 So, if anyone wants to know about the schemas.., how to post data from input to mongodb, this project will help them a lot.
